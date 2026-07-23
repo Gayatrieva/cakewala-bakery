@@ -13,18 +13,19 @@
 //   navigate    – navigate(pageKey) function
 
 import { useState } from "react";
-import { Menu, Home, LogOut, BarChart2, Package, Users, Cake, Sparkles } from "lucide-react";
+import { Menu, Home, LogOut, BarChart2, Package, Users, Cake, Sparkles, MessageSquare } from "lucide-react";
 import { R, RL, GOLD, DARK, MID, BORDER } from "../constants/tokens";
 
 const AdminLayout = ({ children, adminPage, setAdminPage, onLogout, navigate }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const navItems = [
-    { key: "dashboard",       label: "Dashboard",        icon: <BarChart2 size={18} /> },
-    { key: "orders",          label: "Orders",           icon: <Package   size={18} /> },
-    { key: "products",        label: "Cakes",            icon: <Cake      size={18} /> },
-    { key: "customers",       label: "Customers",        icon: <Users     size={18} /> },
-    { key: "custom-requests", label: "Custom Requests",  icon: <Sparkles  size={18} /> },
+    { key: "dashboard",       label: "Dashboard",        icon: <BarChart2      size={18} /> },
+    { key: "orders",          label: "Orders",           icon: <Package        size={18} /> },
+    { key: "products",        label: "Cakes",            icon: <Cake           size={18} /> },
+    { key: "customers",       label: "Customers",        icon: <Users          size={18} /> },
+    { key: "custom-requests", label: "Custom Requests",  icon: <Sparkles       size={18} /> },
+    { key: "testimonials",    label: "Testimonials",     icon: <MessageSquare  size={18} /> },
   ];
 
   return (

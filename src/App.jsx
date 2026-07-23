@@ -34,6 +34,7 @@ import AdminOrders          from "./admin/AdminOrders";
 import AdminProducts        from "./admin/AdminProducts";
 import AdminCustomers       from "./admin/AdminCustomers";
 import AdminCustomRequests  from "./admin/AdminCustomRequests";
+import AdminTestimonials    from "./admin/AdminTestimonials";
 
 import { CAKES } from "./constants/data";
 
@@ -120,6 +121,7 @@ export default function App() {
         {adminPage === "products"         && <AdminProducts />}
         {adminPage === "customers"        && <AdminCustomers />}
         {adminPage === "custom-requests"  && <AdminCustomRequests />}
+        {adminPage === "testimonials"     && <AdminTestimonials />}
       </AdminLayout>
     </>
   );

@@ -15,6 +15,7 @@
 import { useState } from "react";
 import { MessageCircle } from "lucide-react";
 import { R, DARK, MID, BORDER, WHATSAPP_NUM } from "../constants/tokens";
+import { api } from "../api/client";
 
 const CheckoutPage = ({ cart, navigate, clearCart }) => {
   const [form, setForm] = useState({
@@ -39,8 +40,30 @@ const CheckoutPage = ({ cart, navigate, clearCart }) => {
     return Object.keys(e).length === 0;
   };
 
-  const handleOrder = () => {
+  const handleOrder = async () => {
     if (!validate()) return;
+    // 1. Save order to backend DB
+    try {
+      await api.placeOrder({
+        customer_name: form.name,
+        phone:         form.phone,
+        email:         form.email,
+        address:       form.address,
+        city:          form.city,
+        pincode:       form.pincode,
+        items: cart.map(i => ({ name: i.name, weight: i.selectedWeight, flavor: i.selectedFlavor, qty: i.qty, price: i.selectedPrice })),
+        subtotal,
+        delivery_fee: delivery,
+        total,
+        payment:       form.payment,
+        delivery_date: form.date,
+        delivery_slot: form.slot,
+        notes:         form.notes,
+      });
+    } catch (e) {
+      console.warn("Backend save failed (order still sent via WhatsApp):", e.message);
+    }
+    // 2. Open WhatsApp (always, even if API fails)
     const items = cart.map(i =>
       `• ${i.name} (${i.selectedWeight}, ${i.selectedFlavor}) ×${i.qty}${i.customMsg ? ` | Msg: "${i.customMsg}"` : ""} — ₹${(i.selectedPrice * i.qty).toLocaleString()}`
     ).join("\n");

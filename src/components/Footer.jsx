@@ -9,7 +9,7 @@
 // Props:
 //   navigate – navigate(pageKey) function
 
-import { Phone, Mail, MapPin, MessageCircle, Instagram, Facebook } from "lucide-react";
+import { Mail, MapPin, MessageCircle, Instagram, Facebook } from "lucide-react";
 import { R, RL, GOLD, DARK, MID, BORDER, WHATSAPP_NUM } from "../constants/tokens";
 import { CATEGORIES } from "../constants/data";
 
@@ -64,7 +64,6 @@ const Footer = ({ navigate }) => (
         <div>
           <p style={{ fontWeight: 700, color: "#fff", marginBottom: 16, fontSize: ".9rem" }}>Get in Touch</p>
           {[
-            [Phone,  "+91 98765 43210"],
             [Mail,   "hello@sweetdelights.in"],
             [MapPin, "42 Rose Garden Lane, Mumbai"],
           ].map(([Icon, text]) => (

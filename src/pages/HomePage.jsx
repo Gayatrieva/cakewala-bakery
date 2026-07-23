@@ -19,7 +19,8 @@ import {
   ArrowRight, Sparkles, Award, Clock, Truck, ChevronRight, ChevronDown, MessageCircle
 } from "lucide-react";
 import { R, RL, RP, GOLD, CREAM, DARK, MID, BORDER, WHATSAPP_NUM } from "../constants/tokens";
-import { CAKES, CATEGORIES, TESTIMONIALS } from "../constants/data";
+import { CAKES, CATEGORIES } from "../constants/data";
+import { api } from "../api/client";
 import FloatingPetals from "../components/FloatingPetals";
 import SectionTitle from "../components/SectionTitle";
 import Stars from "../components/Stars";
@@ -28,12 +29,35 @@ import Badge from "../components/Badge";
 const HomePage = ({ navigate, addToCart, setCartOpen }) => {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [faqOpen, setFaqOpen] = useState(null);
+  const [approvedTestimonials, setApprovedTestimonials] = useState([]);
+  const [feedbackForm, setFeedbackForm] = useState({ name: "", city: "", rating: 5, text: "" });
+  const [feedbackDone,  setFeedbackDone]  = useState(false);
+  const [feedbackError, setFeedbackError] = useState("");
+
+  // Fetch approved testimonials on mount
+  useEffect(() => {
+    api.getTestimonials().then(setApprovedTestimonials).catch(() => {});
+  }, []);
 
   // Auto-rotate testimonials every 4.5 seconds
   useEffect(() => {
-    const t = setInterval(() => setCurrentTestimonial(c => (c + 1) % TESTIMONIALS.length), 4500);
+    if (!approvedTestimonials.length) return;
+    const t = setInterval(() => setCurrentTestimonial(c => (c + 1) % approvedTestimonials.length), 4500);
     return () => clearInterval(t);
-  }, []);
+  }, [approvedTestimonials.length]);
+
+  const submitFeedback = async () => {
+    if (!feedbackForm.name.trim()) { setFeedbackError("Please enter your name."); return; }
+    if (!feedbackForm.text.trim()) { setFeedbackError("Please write a short review."); return; }
+    setFeedbackError("");
+    try {
+      await api.submitTestimonial(feedbackForm);
+      setFeedbackDone(true);
+      setFeedbackForm({ name: "", city: "", rating: 5, text: "" });
+    } catch (e) {
+      setFeedbackError(e.message || "Failed to submit. Please try again.");
+    }
+  };
 
   const faqs = [
     { q: "How early should I place my order?",       a: "We recommend ordering at least 2–3 days in advance. For custom and wedding cakes, please order 7–10 days ahead for best results." },
@@ -208,28 +232,120 @@ const HomePage = ({ navigate, addToCart, setCartOpen }) => {
             <div style={{ background: "#fff", borderRadius: 24, padding: "40px 48px", boxShadow: "0 12px 48px rgba(192,57,92,.12)", position: "relative", minHeight: 200 }}>
               <div style={{ fontSize: 64, color: `${R}20`, position: "absolute", top: 16, left: 24, fontFamily: "Georgia", lineHeight: 1 }}>"</div>
               <div className="animate-fade-in" key={currentTestimonial}>
-                <Stars rating={TESTIMONIALS[currentTestimonial].rating} size={18} />
+                <Stars rating={approvedTestimonials[currentTestimonial % Math.max(approvedTestimonials.length,1)]?.rating ?? 5} size={18} />
                 <p className="font-display" style={{ fontSize: "1.15rem", fontStyle: "italic", color: DARK, lineHeight: 1.7, margin: "16px 0 20px" }}>
-                  "{TESTIMONIALS[currentTestimonial].text}"
+                  "{approvedTestimonials[currentTestimonial % Math.max(approvedTestimonials.length,1)]?.text}"
                 </p>
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   <div style={{ width: 44, height: 44, borderRadius: "50%", background: `linear-gradient(135deg,${R},${RL})`, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: ".85rem" }}>
-                    {TESTIMONIALS[currentTestimonial].avatar}
+                    {approvedTestimonials[currentTestimonial % Math.max(approvedTestimonials.length,1)]?.avatar}
                   </div>
                   <div>
-                    <p style={{ fontWeight: 700, color: DARK }}>{TESTIMONIALS[currentTestimonial].name}</p>
-                    <p style={{ fontSize: ".78rem", color: MID }}>{TESTIMONIALS[currentTestimonial].city} · {TESTIMONIALS[currentTestimonial].date}</p>
+                    <p style={{ fontWeight: 700, color: DARK }}>{approvedTestimonials[currentTestimonial % Math.max(approvedTestimonials.length,1)]?.name}</p>
+                    <p style={{ fontSize: ".78rem", color: MID }}>{approvedTestimonials[currentTestimonial % Math.max(approvedTestimonials.length,1)]?.city} · {approvedTestimonials[currentTestimonial % Math.max(approvedTestimonials.length,1)]?.date}</p>
                   </div>
                 </div>
               </div>
             </div>
             {/* Dot indicators */}
             <div style={{ display: "flex", justifyContent: "center", gap: 8, marginTop: 20 }}>
-              {TESTIMONIALS.map((_, i) => (
+              {approvedTestimonials.map((_, i) => (
                 <button key={i} onClick={() => setCurrentTestimonial(i)}
                   style={{ width: i === currentTestimonial ? 24 : 8, height: 8, borderRadius: 4, background: i === currentTestimonial ? R : BORDER, border: "none", cursor: "pointer", transition: "all .3s" }} />
               ))}
             </div>
+          </div>
+
+          {/* ── Customer Feedback Form ── */}
+          <div style={{ marginTop: 56 }}>
+            <SectionTitle eyebrow="Share Your Experience" title="Leave a Review" sub="Your feedback helps us bake better and serve you sweeter! 🍰" />
+
+            {feedbackDone ? (
+              // Thank-you card
+              <div className="animate-bounce-in" style={{
+                background: "#fff", borderRadius: 24, padding: "40px 32px", textAlign: "center",
+                boxShadow: "0 12px 40px rgba(192,57,92,.12)", border: `1px solid ${BORDER}`,
+              }}>
+                <div style={{ fontSize: "3.5rem", marginBottom: 12 }}>🎉</div>
+                <h3 className="font-display" style={{ fontWeight: 700, color: DARK, fontSize: "1.3rem", marginBottom: 8 }}>Thank you for your kind words!</h3>
+                <p style={{ color: MID, fontSize: ".9rem", lineHeight: 1.6, marginBottom: 24 }}>
+                  Your review has been submitted and will appear on our site once approved by our team.
+                </p>
+                <button className="btn-rose" onClick={() => setFeedbackDone(false)}
+                  style={{ padding: "10px 28px", borderRadius: 12, fontWeight: 600, fontSize: ".9rem" }}>
+                  Submit Another Review
+                </button>
+              </div>
+            ) : (
+              // Feedback form
+              <div style={{
+                background: "#fff", borderRadius: 24, padding: "36px 40px",
+                boxShadow: "0 12px 40px rgba(192,57,92,.10)", border: `1px solid ${BORDER}`,
+              }}>
+                {/* Row: Name + City */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 18 }}>
+                  {[["name","Your Name *","text"],["city","Your City","text"]].map(([field, label, type]) => (
+                    <div key={field}>
+                      <label style={{ fontWeight: 600, color: DARK, fontSize: ".85rem", display: "block", marginBottom: 6 }}>{label}</label>
+                      <input
+                        type={type}
+                        placeholder={field === "name" ? "e.g. Priya Sharma" : "e.g. Mumbai"}
+                        value={feedbackForm[field]}
+                        onChange={e => setFeedbackForm(f => ({ ...f, [field]: e.target.value }))}
+                        style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${BORDER}`, fontSize: ".88rem", color: DARK, boxSizing: "border-box" }}
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Star rating picker */}
+                <div style={{ marginBottom: 18 }}>
+                  <label style={{ fontWeight: 600, color: DARK, fontSize: ".85rem", display: "block", marginBottom: 8 }}>Your Rating *</label>
+                  <div style={{ display: "flex", gap: 6 }}>
+                    {[1,2,3,4,5].map(star => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setFeedbackForm(f => ({ ...f, rating: star }))}
+                        style={{
+                          background: "none", border: "none", cursor: "pointer", padding: 2,
+                          fontSize: "1.8rem", lineHeight: 1, transition: "transform .15s",
+                          color: star <= feedbackForm.rating ? "#F59E0B" : "#E5E7EB",
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.transform = "scale(1.2)"}
+                        onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
+                      >
+                        ★
+                      </button>
+                    ))}
+                    <span style={{ alignSelf: "center", marginLeft: 8, color: GOLD, fontWeight: 700, fontSize: ".9rem" }}>
+                      {["Poor","Fair","Good","Great","Excellent!"][feedbackForm.rating - 1]}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Review text */}
+                <div style={{ marginBottom: 20 }}>
+                  <label style={{ fontWeight: 600, color: DARK, fontSize: ".85rem", display: "block", marginBottom: 6 }}>Your Review *</label>
+                  <textarea
+                    rows={4}
+                    placeholder="Tell us about your experience with our cakes..."
+                    value={feedbackForm.text}
+                    onChange={e => setFeedbackForm(f => ({ ...f, text: e.target.value }))}
+                    style={{ width: "100%", padding: "12px 14px", borderRadius: 10, border: `1.5px solid ${BORDER}`, fontSize: ".9rem", fontFamily: "inherit", color: DARK, resize: "vertical", boxSizing: "border-box" }}
+                  />
+                </div>
+
+                {feedbackError && (
+                  <p style={{ color: "#EF4444", fontSize: ".82rem", marginBottom: 12, fontWeight: 600 }}>⚠ {feedbackError}</p>
+                )}
+
+                <button className="btn-rose" onClick={submitFeedback}
+                  style={{ width: "100%", padding: "14px", borderRadius: 12, fontWeight: 700, fontSize: ".95rem" }}>
+                  ✨ Submit My Review
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </section>

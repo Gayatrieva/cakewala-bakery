@@ -12,6 +12,7 @@
 import { useState } from "react";
 import { Minus, Plus, MessageCircle, Camera } from "lucide-react";
 import { R, GOLD, DARK, MID, BORDER, WHATSAPP_NUM } from "../constants/tokens";
+import { api } from "../api/client";
 
 const CustomCakePage = ({ navigate }) => {
   const [form, setForm] = useState({
@@ -32,8 +33,27 @@ const CustomCakePage = ({ navigate }) => {
     form.message ? `Details: ${form.message}`          : "",
   ].filter(Boolean).join("\n");
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!form.name || !form.phone) return;
+    // 1. Save to backend DB
+    try {
+      await api.submitCustomRequest({
+        name:          form.name,
+        phone:         form.phone,
+        email:         form.email,
+        shape:         form.shape,
+        size:          form.size,
+        flavor:        form.flavor,
+        tiers:         form.tiers,
+        occasion:      form.occasion,
+        budget:        form.budget,
+        delivery_date: form.date,
+        message:       form.message,
+      });
+    } catch (e) {
+      console.warn("Backend save failed (inquiry still sent via WhatsApp):", e.message);
+    }
+    // 2. Open WhatsApp (always)
     window.open(`https://wa.me/${WHATSAPP_NUM}?text=${encodeURIComponent(buildWA())}`, "_blank");
     setSubmitted(true);
   };

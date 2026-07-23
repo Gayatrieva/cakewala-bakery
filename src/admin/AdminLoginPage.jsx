@@ -1,27 +1,35 @@
 // ─── AdminLoginPage ───────────────────────────────────────────────────────────
-// Simple admin login screen with email + password fields.
-// Demo credentials: admin@sweetdelights.in / admin123
+// Admin login screen. Validates credentials locally (no backend required).
 //
 // Props:
 //   onLogin – callback fired on successful login
 
 import { useState } from "react";
 import { R, RL, GOLD, DARK, MID, BORDER } from "../constants/tokens";
+import { setToken } from "../api/client";
 
-const DEMO_EMAIL = "admin@sweetdelights.in";
-const DEMO_PASS  = "admin123";
+const ADMIN_EMAIL    = "admin@sweetdelights.in";
+const ADMIN_PASSWORD = "admin123";
 
 const AdminLoginPage = ({ onLogin }) => {
-  const [email, setEmail] = useState(DEMO_EMAIL);
-  const [pass,  setPass]  = useState(DEMO_PASS);
+  const [email, setEmail] = useState("admin@sweetdelights.in");
+  const [pass,  setPass]  = useState("admin123");
   const [err,   setErr]   = useState("");
+  const [loading, setLoading] = useState(false);
 
   const login = () => {
-    if (email === DEMO_EMAIL && pass === DEMO_PASS) {
-      onLogin();
-    } else {
-      setErr("Invalid credentials. Use admin@sweetdelights.in / admin123");
-    }
+    setErr("");
+    setLoading(true);
+    // Small delay for UX feedback
+    setTimeout(() => {
+      if (email.trim() === ADMIN_EMAIL && pass === ADMIN_PASSWORD) {
+        setToken("local-admin-token");
+        onLogin();
+      } else {
+        setErr("Invalid email or password.");
+      }
+      setLoading(false);
+    }, 500);
   };
 
   return (
@@ -35,22 +43,26 @@ const AdminLoginPage = ({ onLogin }) => {
           <p style={{ color: MID, fontSize: ".85rem", marginTop: 4 }}>Sweet Delights Bakery</p>
         </div>
 
-        {/* Error message */}
+        {/* Error */}
         {err && <p style={{ background: "#FEE2E2", color: "#991B1B", borderRadius: 10, padding: "10px 14px", fontSize: ".82rem", marginBottom: 16 }}>{err}</p>}
 
         {/* Fields */}
         {[["Email", email, setEmail, "email"], ["Password", pass, setPass, "password"]].map(([label, val, setter, type]) => (
           <div key={label} style={{ marginBottom: 14 }}>
             <label style={{ fontWeight: 600, color: DARK, fontSize: ".88rem", display: "block", marginBottom: 6 }}>{label}</label>
-            <input value={val} onChange={e => setter(e.target.value)} type={type} onKeyDown={e => e.key === "Enter" && login()}
+            <input value={val} onChange={e => setter(e.target.value)} type={type}
+              onKeyDown={e => e.key === "Enter" && login()}
               style={{ width: "100%", padding: "12px 16px", borderRadius: 10, border: `1.5px solid ${BORDER}`, fontSize: ".9rem", color: DARK }} />
           </div>
         ))}
 
-        <button className="btn-rose" onClick={login} style={{ width: "100%", marginTop: 8, padding: "14px", borderRadius: 12, fontSize: "1rem", fontWeight: 700 }}>
-          Login to Dashboard
+        <button className="btn-rose" onClick={login} disabled={loading}
+          style={{ width: "100%", marginTop: 8, padding: "14px", borderRadius: 12, fontSize: "1rem", fontWeight: 700, opacity: loading ? .7 : 1 }}>
+          {loading ? "Logging in…" : "Login to Dashboard"}
         </button>
-        <p style={{ textAlign: "center", color: MID, fontSize: ".75rem", marginTop: 16 }}>Demo: {DEMO_EMAIL} / {DEMO_PASS}</p>
+        <p style={{ textAlign: "center", color: MID, fontSize: ".75rem", marginTop: 16 }}>
+          Default: admin@sweetdelights.in / admin123
+        </p>
       </div>
     </div>
   );
