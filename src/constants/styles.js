@@ -60,6 +60,16 @@ const CSS = `
   .nav-link::after  { content:''; position:absolute; bottom:-4px; left:0; width:0; height:2px; background:${R}; transition:width .3s; }
   .nav-link:hover::after,.nav-link.active::after { width:100%; }
 
+  /* ── Responsive visibility helpers ── */
+  /* Desktop-only: hide on mobile (≤768px) */
+  .hide-mobile { display:flex; }
+  /* Mobile hamburger: hidden by default, shown on mobile */
+  .show-mobile { display:none; }
+  @media(max-width:768px) {
+    .hide-mobile { display:none !important; }
+    .show-mobile { display:flex !important; }
+  }
+
   /* ── Misc UI ── */
   .section-title    { font-family:'Playfair Display',serif; }
   .lace-divider     { border:none; height:2px; background:linear-gradient(90deg,transparent,${GOLD},transparent); margin:0; }
@@ -83,9 +93,133 @@ const CSS = `
   .modal-overlay    { position:fixed; inset:0; background:rgba(42,18,21,.45); z-index:1000; display:flex; align-items:center; justify-content:center; padding:16px; animation:fade-in .2s ease; }
   .modal-box        { background:#fff; border-radius:20px; max-height:90vh; overflow-y:auto; width:100%; max-width:500px; animation:bounce-in .4s ease; }
 
-  /* ── Responsive helpers ── */
-  @media(max-width:768px){ .hide-mobile{display:none!important;} }
-  @media(min-width:769px){ .show-mobile{display:none!important;} }
+  /* ── Mobile-first responsive layout ── */
+
+  /* Hero grid: 2-col → 1-col */
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: center;
+  }
+  /* Cake detail: 2-col → 1-col */
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+  /* Checkout: form + sidebar → stacked */
+  .checkout-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 32px;
+    align-items: start;
+  }
+  /* Checkout inner name/phone row */
+  .checkout-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  /* Footer 4-col grid */
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1.5fr;
+    gap: 40px;
+    margin-bottom: 48px;
+  }
+  /* Feedback form name+city */
+  .feedback-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+  /* Admin sidebar layout */
+  .admin-layout {
+    display: flex;
+    min-height: 100vh;
+  }
+  .admin-sidebar {
+    width: 240px;
+    flex-shrink: 0;
+  }
+  .admin-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* Hero image circle responsive */
+  .hero-image-wrap {
+    width: 380px;
+    height: 380px;
+  }
+
+  /* ── Tablet (≤900px) ── */
+  @media(max-width:900px) {
+    .checkout-grid { grid-template-columns: 1fr; }
+    .hero-image-wrap { width: 300px; height: 300px; }
+  }
+
+  /* ── Mobile (≤768px) ── */
+  @media(max-width:768px) {
+    .hero-grid {
+      grid-template-columns: 1fr;
+      gap: 32px;
+      text-align: center;
+      padding: 40px 16px !important;
+    }
+    .hero-grid > div:last-child { display: flex; justify-content: center; }
+    .hero-image-wrap { width: 260px; height: 260px; box-shadow: 0 0 0 12px rgba(192,57,92,.08), 0 0 0 24px rgba(192,57,92,.04) !important; }
+
+    .detail-grid { grid-template-columns: 1fr; gap: 24px; }
+
+    .checkout-grid { grid-template-columns: 1fr; }
+    .checkout-row-2 { grid-template-columns: 1fr; }
+    .checkout-row-2 > div { padding-left: 0 !important; padding-right: 0 !important; }
+
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 28px; }
+
+    .feedback-row { grid-template-columns: 1fr; }
+
+    .admin-layout { flex-direction: column; }
+    .admin-sidebar { width: 100%; }
+
+    /* Section padding reduction */
+    section { padding-top: 48px !important; padding-bottom: 48px !important; }
+
+    /* CTA buttons stack */
+    .cta-btns { flex-direction: column; align-items: stretch; }
+    .cta-btns a, .cta-btns button { text-align: center; justify-content: center; }
+
+    /* Testimonial card padding */
+    .testimonial-card { padding: 24px 20px !important; }
+
+    /* Payment method cards */
+    .payment-methods { flex-direction: column !important; }
+  }
+
+  /* ── Small mobile (≤480px) ── */
+  @media(max-width:480px) {
+    .footer-grid { grid-template-columns: 1fr; }
+    .hero-image-wrap { width: 220px; height: 220px; }
+
+    /* Navbar */
+    nav > div { padding: 0 12px !important; height: 60px !important; }
+
+    /* Cake detail CTA row */
+    .detail-cta { flex-direction: column; }
+    .detail-cta a { width: 100%; text-align: center; justify-content: center; padding: 14px !important; }
+
+    /* Checkout form summary comes first on mobile */
+    .checkout-summary-first { order: -1; }
+
+    /* Trust signals wrap */
+    .trust-signals { gap: 14px !important; }
+
+    /* Hero headline */
+    .hero-headline { font-size: clamp(1.8rem, 8vw, 2.4rem) !important; }
+  }
 `;
 
 export default CSS;

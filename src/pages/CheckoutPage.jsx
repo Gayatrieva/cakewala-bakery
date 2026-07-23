@@ -98,25 +98,25 @@ const CheckoutPage = ({ cart, navigate, clearCart }) => {
     <div style={{ maxWidth: 1100, margin: "0 auto", padding: "48px 20px" }}>
       <h1 className="font-display" style={{ fontSize: "2rem", fontWeight: 700, color: DARK, marginBottom: 32 }}>Checkout</h1>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 380px", gap: 32, alignItems: "start" }}>
+      <div className="checkout-grid">
 
         {/* Left: Customer details form */}
         <div style={{ background: "#fff", borderRadius: 24, padding: 32, boxShadow: "0 4px 24px rgba(192,57,92,.08)", border: `1px solid ${BORDER}` }}>
           <p className="font-display" style={{ fontWeight: 700, fontSize: "1.15rem", color: DARK, marginBottom: 20 }}>Your Details</p>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0 }}>
+          <div className="checkout-row-2" style={{ gap: 0 }}>
             <div style={{ paddingRight: 10 }}><F label="Full Name" field="name" placeholder="Priya Sharma" req /></div>
             <div style={{ paddingLeft:  10 }}><F label="Phone"     field="phone" placeholder="9876543210" req /></div>
           </div>
           <F label="Email" field="email" placeholder="priya@email.com" type="email" />
           <F label="Delivery Address" field="address" placeholder="House / Flat No, Street, Area" req />
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0 }}>
+          <div className="checkout-row-2" style={{ gap: 0 }}>
             <div style={{ paddingRight: 10 }}><F label="City"    field="city"    placeholder="Mumbai" /></div>
             <div style={{ paddingLeft:  10 }}><F label="Pincode" field="pincode" placeholder="400001" /></div>
           </div>
 
           {/* Date + Slot */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0 }}>
+          <div className="checkout-row-2" style={{ gap: 0 }}>
             <div style={{ paddingRight: 10 }}>
               <label style={{ fontWeight: 600, color: DARK, fontSize: ".88rem", marginBottom: 6, display: "block" }}>Delivery Date <span style={{ color: R }}>*</span></label>
               <input type="date" value={form.date} onChange={e => upd("date", e.target.value)} min={new Date().toISOString().split("T")[0]}
@@ -141,7 +141,7 @@ const CheckoutPage = ({ cart, navigate, clearCart }) => {
 
           {/* Payment method */}
           <p className="font-display" style={{ fontWeight: 700, fontSize: "1.1rem", color: DARK, marginBottom: 14 }}>Payment Method</p>
-          <div style={{ display: "flex", gap: 14 }}>
+          <div className="payment-methods" style={{ display: "flex", gap: 14 }}>
             {[
               ["cod",       "💵 Cash on Delivery", "Pay when your cake arrives"],
               ["whatsapp",  "💳 Pay via WhatsApp",  "We'll send payment link"],
@@ -156,7 +156,7 @@ const CheckoutPage = ({ cart, navigate, clearCart }) => {
         </div>
 
         {/* Right: Order summary (sticky) */}
-        <div style={{ background: "#fff", borderRadius: 24, padding: 28, boxShadow: "0 4px 24px rgba(192,57,92,.08)", border: `1px solid ${BORDER}`, position: "sticky", top: 90 }}>
+        <div className="checkout-summary-first" style={{ background: "#fff", borderRadius: 24, padding: 28, boxShadow: "0 4px 24px rgba(192,57,92,.08)", border: `1px solid ${BORDER}`, position: "sticky", top: 90 }}>
           <p className="font-display" style={{ fontWeight: 700, fontSize: "1.1rem", color: DARK, marginBottom: 16 }}>Order Summary</p>
           <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 16 }}>
             {cart.map(i => (

@@ -50,7 +50,7 @@ const CakeDetailPage = ({ cake, navigate, addToCart, setCartOpen }) => {
         <span style={{ color: R }}>{cake.name}</span>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "start" }}>
+      <div className="detail-grid" style={{ marginBottom: 40 }}>
 
         {/* Left: Image gallery */}
         <div className="animate-fade-up">
@@ -135,7 +135,7 @@ const CakeDetailPage = ({ cake, navigate, addToCart, setCartOpen }) => {
           </div>
 
           {/* CTA buttons */}
-          <div style={{ display: "flex", gap: 12 }}>
+          <div className="detail-cta" style={{ display: "flex", gap: 12 }}>
             <button className={`btn-rose ${added ? "animate-pop" : ""}`} onClick={handleAdd}
               style={{ flex: 2, padding: "14px", borderRadius: 12, fontSize: "1rem", fontWeight: 700 }}>
               {added ? "✓ Added to Cart!" : "Add to Cart 🛒"}

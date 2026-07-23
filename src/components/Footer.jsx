@@ -17,7 +17,7 @@ const Footer = ({ navigate }) => (
   <footer style={{ background: `linear-gradient(135deg,${DARK} 0%,#3D1422 100%)`, color: "rgba(255,255,255,.75)", padding: "60px 20px 20px" }}>
     <div style={{ maxWidth: 1200, margin: "0 auto" }}>
       {/* Top grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1.5fr", gap: 40, marginBottom: 48 }}>
+      <div className="footer-grid">
 
         {/* Brand column */}
         <div>

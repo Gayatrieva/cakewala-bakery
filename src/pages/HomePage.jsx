@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { R, RL, RP, GOLD, CREAM, DARK, MID, BORDER, WHATSAPP_NUM } from "../constants/tokens";
 import { CAKES, CATEGORIES } from "../constants/data";
-import { api } from "../api/client";
+import { TestimonialsStore } from "../constants/TestimonialsStore";
 import FloatingPetals from "../components/FloatingPetals";
 import SectionTitle from "../components/SectionTitle";
 import Stars from "../components/Stars";
@@ -29,15 +29,10 @@ import Badge from "../components/Badge";
 const HomePage = ({ navigate, addToCart, setCartOpen }) => {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [faqOpen, setFaqOpen] = useState(null);
-  const [approvedTestimonials, setApprovedTestimonials] = useState([]);
-  const [feedbackForm, setFeedbackForm] = useState({ name: "", city: "", rating: 5, text: "" });
-  const [feedbackDone,  setFeedbackDone]  = useState(false);
-  const [feedbackError, setFeedbackError] = useState("");
+  const [approvedTestimonials, setApprovedTestimonials] = useState(() => TestimonialsStore.getApproved());
 
-  // Fetch approved testimonials on mount
-  useEffect(() => {
-    api.getTestimonials().then(setApprovedTestimonials).catch(() => {});
-  }, []);
+  // Keep in sync with store
+  useEffect(() => TestimonialsStore.subscribe(() => setApprovedTestimonials(TestimonialsStore.getApproved())), []);
 
   // Auto-rotate testimonials every 4.5 seconds
   useEffect(() => {
@@ -46,17 +41,17 @@ const HomePage = ({ navigate, addToCart, setCartOpen }) => {
     return () => clearInterval(t);
   }, [approvedTestimonials.length]);
 
-  const submitFeedback = async () => {
+  const [feedbackForm, setFeedbackForm] = useState({ name: "", city: "", rating: 5, text: "" });
+  const [feedbackDone,  setFeedbackDone]  = useState(false);
+  const [feedbackError, setFeedbackError] = useState("");
+
+  const submitFeedback = () => {
     if (!feedbackForm.name.trim()) { setFeedbackError("Please enter your name."); return; }
     if (!feedbackForm.text.trim()) { setFeedbackError("Please write a short review."); return; }
     setFeedbackError("");
-    try {
-      await api.submitTestimonial(feedbackForm);
-      setFeedbackDone(true);
-      setFeedbackForm({ name: "", city: "", rating: 5, text: "" });
-    } catch (e) {
-      setFeedbackError(e.message || "Failed to submit. Please try again.");
-    }
+    TestimonialsStore.submit(feedbackForm);
+    setFeedbackDone(true);
+    setFeedbackForm({ name: "", city: "", rating: 5, text: "" });
   };
 
   const faqs = [
@@ -72,21 +67,21 @@ const HomePage = ({ navigate, addToCart, setCartOpen }) => {
       {/* ── HERO ──────────────────────────────────────────────── */}
       <section style={{ position: "relative", background: `linear-gradient(135deg,${CREAM} 0%,#FFF0F5 50%,#FEF0E7 100%)`, minHeight: "90vh", display: "flex", alignItems: "center", overflow: "hidden" }}>
         <FloatingPetals />
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "60px 20px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "center", position: "relative", zIndex: 2, width: "100%" }}>
+        <div className="hero-grid" style={{ maxWidth: 1200, margin: "0 auto", padding: "60px 20px", position: "relative", zIndex: 2, width: "100%" }}>
 
           {/* Hero text */}
           <div className="animate-fade-up">
             <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: `${GOLD}18`, border: `1px solid ${GOLD}40`, borderRadius: 999, padding: "6px 16px", marginBottom: 20 }}>
               <span style={{ color: GOLD, fontSize: ".75rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase" }}>✦ Est. 2018 · Artisan Bakery</span>
             </div>
-            <h1 className="font-display" style={{ fontSize: "clamp(2.4rem,5vw,3.8rem)", fontWeight: 700, color: DARK, lineHeight: 1.15, marginBottom: 20 }}>
+            <h1 className="font-display hero-headline" style={{ fontSize: "clamp(2.4rem,5vw,3.8rem)", fontWeight: 700, color: DARK, lineHeight: 1.15, marginBottom: 20 }}>
               Cakes Baked with<br />
               <span style={{ color: R, fontStyle: "italic" }}>Love & Artistry</span>
             </h1>
             <p style={{ fontSize: "1.05rem", color: MID, lineHeight: 1.7, maxWidth: 480, marginBottom: 32 }}>
               Every celebration deserves a cake that's as beautiful as the moment. Hand-crafted to order, delivered fresh to your door.
             </p>
-            <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+            <div className="cta-btns" style={{ display: "flex", gap: 16, flexWrap: "wrap", justifyContent: "flex-start" }}>
               <button className="btn-rose" onClick={() => navigate("cakes")} style={{ padding: "14px 32px", borderRadius: 12, fontSize: "1rem", fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}>
                 Shop Cakes <ArrowRight size={18} />
               </button>
@@ -95,7 +90,7 @@ const HomePage = ({ navigate, addToCart, setCartOpen }) => {
               </button>
             </div>
             {/* Trust signals */}
-            <div style={{ display: "flex", gap: 24, marginTop: 36, flexWrap: "wrap" }}>
+            <div className="trust-signals" style={{ display: "flex", gap: 24, marginTop: 36, flexWrap: "wrap", justifyContent: "flex-start" }}>
               {[["⭐", "4.9/5", "1,200+ Reviews"], ["🎂", "15,000+", "Cakes Delivered"], ["🚚", "Free", "On orders ₹1,499+"]].map(([ic, val, label]) => (
                 <div key={label} style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <span style={{ fontSize: "1.2rem" }}>{ic}</span>
@@ -110,7 +105,7 @@ const HomePage = ({ navigate, addToCart, setCartOpen }) => {
 
           {/* Hero image with floating mini-badges */}
           <div style={{ display: "flex", justifyContent: "center", alignItems: "center", position: "relative" }}>
-            <div style={{ width: 380, height: 380, borderRadius: "50%", background: `linear-gradient(135deg,${RP} 0%,#FFF0F5 100%)`, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 0 0 16px ${RP}, 0 0 0 32px ${RP}88`, overflow: "hidden", position: "relative" }}>
+            <div className="hero-image-wrap" style={{ borderRadius: "50%", background: `linear-gradient(135deg,${RP} 0%,#FFF0F5 100%)`, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 0 0 16px ${RP}, 0 0 0 32px ${RP}88`, overflow: "hidden", position: "relative" }}>
               <img className="hero-img" src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=700&q=85" alt="Hero Cake" style={{ width: "90%", height: "90%", objectFit: "cover", borderRadius: "50%" }} />
             </div>
             {[
@@ -229,7 +224,7 @@ const HomePage = ({ navigate, addToCart, setCartOpen }) => {
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
           <SectionTitle eyebrow="Love Letters" title="What Our Customers Say" />
           <div style={{ position: "relative" }}>
-            <div style={{ background: "#fff", borderRadius: 24, padding: "40px 48px", boxShadow: "0 12px 48px rgba(192,57,92,.12)", position: "relative", minHeight: 200 }}>
+            <div className="testimonial-card" style={{ background: "#fff", borderRadius: 24, padding: "40px 48px", boxShadow: "0 12px 48px rgba(192,57,92,.12)", position: "relative", minHeight: 200 }}>
               <div style={{ fontSize: 64, color: `${R}20`, position: "absolute", top: 16, left: 24, fontFamily: "Georgia", lineHeight: 1 }}>"</div>
               <div className="animate-fade-in" key={currentTestimonial}>
                 <Stars rating={approvedTestimonials[currentTestimonial % Math.max(approvedTestimonials.length,1)]?.rating ?? 5} size={18} />
@@ -283,7 +278,7 @@ const HomePage = ({ navigate, addToCart, setCartOpen }) => {
                 boxShadow: "0 12px 40px rgba(192,57,92,.10)", border: `1px solid ${BORDER}`,
               }}>
                 {/* Row: Name + City */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 18 }}>
+                <div className="feedback-row">
                   {[["name","Your Name *","text"],["city","Your City","text"]].map(([field, label, type]) => (
                     <div key={field}>
                       <label style={{ fontWeight: 600, color: DARK, fontSize: ".85rem", display: "block", marginBottom: 6 }}>{label}</label>
@@ -377,7 +372,7 @@ const HomePage = ({ navigate, addToCart, setCartOpen }) => {
           <p style={{ color: "rgba(255,255,255,.8)", fontSize: ".85rem", fontWeight: 600, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 12 }}>✦ Planning Something Special? ✦</p>
           <h2 className="font-display" style={{ color: "#fff", fontSize: "2rem", fontWeight: 700, marginBottom: 16 }}>Let's Create Your Dream Cake Together</h2>
           <p style={{ color: "rgba(255,255,255,.85)", marginBottom: 28, lineHeight: 1.6 }}>From bespoke wedding cakes to whimsical birthday creations — our bakers bring your vision to life.</p>
-          <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
+          <div className="cta-btns" style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
             <button onClick={() => navigate("custom-cake")}
               style={{ background: "#fff", color: R, border: "none", cursor: "pointer", padding: "13px 28px", borderRadius: 12, fontWeight: 700, fontSize: ".95rem", transition: "all .25s" }}
               onMouseEnter={e => { e.target.style.transform = "scale(1.05)"; }} onMouseLeave={e => { e.target.style.transform = "scale(1)"; }}>

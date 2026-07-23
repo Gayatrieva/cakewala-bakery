@@ -11,7 +11,7 @@ const AboutPage = () => (
   <div style={{ maxWidth: 1100, margin: "0 auto", padding: "60px 20px" }}>
 
     {/* ── Story section ── */}
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 60, alignItems: "center", marginBottom: 80 }}>
+    <div className="detail-grid" style={{ gap: 60, marginBottom: 80 }}>
       <div className="animate-fade-up">
         <p style={{ color: GOLD, fontSize: ".8rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", marginBottom: 10 }}>Our Story</p>
         <h1 className="font-display" style={{ fontSize: "2.6rem", fontWeight: 700, color: DARK, lineHeight: 1.2, marginBottom: 20 }}>

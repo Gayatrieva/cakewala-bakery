@@ -34,12 +34,11 @@ const ContactPage = () => {
         <h1 className="font-display" style={{ fontSize: "2.4rem", fontWeight: 700, color: DARK }}>We'd Love to Hear from You</h1>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1.3fr", gap: 48 }}>
+      <div className="checkout-grid" style={{ gap: 48 }}>
 
         {/* Left: Contact info */}
         <div>
           {[
-            { icon: <Phone  size={20} color={R} />, title: "Call / WhatsApp", lines: ["+91 98765 43210", "Mon–Sun, 9am–9pm"] },
             { icon: <Mail   size={20} color={R} />, title: "Email Us",         lines: ["hello@sweetdelights.in", "We reply within 4 hours"] },
             { icon: <MapPin size={20} color={R} />, title: "Visit Us",          lines: ["42 Rose Garden Lane", "Bandra West, Mumbai 400050"] },
             { icon: <Clock  size={20} color={R} />, title: "Opening Hours",     lines: ["Mon–Sat: 9am – 9pm", "Sunday: 10am – 6pm"] },
